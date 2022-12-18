@@ -29,6 +29,8 @@ public class MainFrame extends JFrame {
 	// Пункты меню
 	private JCheckBoxMenuItem showAxisMenuItem;
 	private JCheckBoxMenuItem showMarkersMenuItem;
+	private JCheckBoxMenuItem showClosedAreasItem;
+	private JCheckBoxMenuItem rotateItem;
 	// Компонент-отображатель графика
 	private GraphicsDisplay display = new GraphicsDisplay();
 	// Флаг, указывающий на загруженность данных графика
@@ -89,10 +91,36 @@ public class MainFrame extends JFrame {
 				display.setShowMarkers(showMarkersMenuItem.isSelected());
 			}
 		};
+		
 		showMarkersMenuItem = new JCheckBoxMenuItem(showMarkersAction);
 		graphicsMenu.add(showMarkersMenuItem);
 		// Элемент по умолчанию включен (отмечен флажком)
 		showMarkersMenuItem.setSelected(true);
+		
+		//элемент для показа замкнутых областей
+		Action showClosedAreasAction = new AbstractAction("Показывать замкнутые области") {
+			public void actionPerformed(ActionEvent e) {
+				display.setShowClosedAreas(showClosedAreasItem.isSelected());
+			}
+		};
+		
+		showClosedAreasItem = new JCheckBoxMenuItem(showClosedAreasAction);
+		graphicsMenu.add(showClosedAreasItem);
+		// Элемент по умолчанию включен (отмечен флажком)
+		showClosedAreasItem.setSelected(false);
+		
+		//элемент для поворота на 90 градусов
+		Action rotateAction = new AbstractAction("Повернуть график") {
+			public void actionPerformed(ActionEvent e) {
+				display.setRotate(rotateItem.isSelected());
+			}
+		};
+		
+		rotateItem = new JCheckBoxMenuItem(rotateAction);
+		graphicsMenu.add(rotateItem);
+		// Элемент по умолчанию включен (отмечен флажком)
+		rotateItem.setSelected(false);
+		
 		// Зарегистрировать обработчик событий, связанных с меню "График"
 		graphicsMenu.addMenuListener(new GraphicsMenuListener());
 		// Установить GraphicsDisplay в цент граничной компоновки
@@ -158,6 +186,8 @@ public class MainFrame extends JFrame {
 			// Доступность или недоступность элементов меню "График" определяется загруженностью данных
 			showAxisMenuItem.setEnabled(fileLoaded);
 			showMarkersMenuItem.setEnabled(fileLoaded);
+			showClosedAreasItem.setEnabled(fileLoaded);
+			rotateItem.setEnabled(fileLoaded);
 		}
 		// Обработчик, вызываемый после того, как меню исчезло с экрана
 		public void menuDeselected(MenuEvent e) {
