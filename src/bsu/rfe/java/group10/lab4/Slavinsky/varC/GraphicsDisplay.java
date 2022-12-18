@@ -1,6 +1,7 @@
 package bsu.rfe.java.group10.lab4.Slavinsky.varC;
 
 import java.awt.BasicStroke;
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -10,6 +11,7 @@ import java.awt.Stroke;
 import java.awt.font.FontRenderContext;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Line2D;
+import java.awt.geom.Path2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 
@@ -242,21 +244,12 @@ public class GraphicsDisplay extends JPanel {
 			canvas.setPaint(Color.RED);
 		}
 		// точки "звёздочками"
-			Point2D.Double center = xyToPoint(point[0], point[1]);
-			Line2D.Double hMarkerLine = 
-					new Line2D.Double(center.x + 5, center.y, center.x - 5, center.y);
-			Line2D.Double vMarkerLine = 
-					new Line2D.Double(center.x, center.y + 5, center.x, center.y - 5);
-			Line2D.Double hvMarkerLine = 
-					new Line2D.Double(center.x + 5, center.y + 5, center.x - 5, center.y - 5);
-			Line2D.Double vhMarkerLine = 
-					new Line2D.Double(center.x - 5, center.y + 5, center.x + 5, center.y - 5);
-			
-			canvas.draw(vhMarkerLine);
-			canvas.draw(hvMarkerLine);
-			canvas.draw(hMarkerLine);
-			canvas.draw(vMarkerLine);
-			
+		Point2D.Double center = xyToPoint(point[0], point[1]);
+				
+		canvas.drawLine((int)center.x + 5, (int)center.y, (int)center.x - 5, (int)center.y);
+		canvas.drawLine((int)center.x, (int)center.y + 5, (int)center.x, (int)center.y - 5);
+		canvas.drawLine((int)center.x + 5, (int)center.y + 5, (int)center.x - 5, (int)center.y - 5);
+		canvas.drawLine((int)center.x - 5, (int)center.y + 5, (int)center.x + 5, (int)center.y - 5);		
 		}
 	} 
 	
