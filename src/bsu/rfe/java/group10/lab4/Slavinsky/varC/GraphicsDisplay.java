@@ -362,12 +362,12 @@ public class GraphicsDisplay extends JPanel implements CustomMouseAdapter{
 							canvas.setPaint(Color.DARK_GRAY);
 							canvas.setFont(axisFont);
 							if(rotate) {
-								labelPos = xyToPoint(0, (graphicsData[from][1] + graphicsData[to][1])/2);
+								labelPos = xyToPoint(0, (graphicsData[from][0] + graphicsData[to][0])/2);
 								if(fromSign < 0)
 									canvas.drawString(sqrText, (float)(labelPos.getX() + bounds.getWidth()/2), (float)(labelPos.getY()));
 								else
 									canvas.drawString(sqrText, (float)(labelPos.getX() - bounds.getWidth()/2), (float)(labelPos.getY()));
-							}
+							} 
 							else {
 							// Вывести надпись в точке с вычисленными координатами
 							if(fromSign < 0)
@@ -571,17 +571,25 @@ public class GraphicsDisplay extends JPanel implements CustomMouseAdapter{
 		сегментов (GeneralPath)*/
 		GeneralPath area = new GeneralPath();
 		if(!rotate)
-			area.moveTo(xyToPoint(graphicsData[from][0], graphicsData[from][1]).getX(), xyToPoint(graphicsData[from][0], 0).getY());
+			area.moveTo(xyToPoint(graphicsData[from][0], graphicsData[from][1]).getX(), 
+					xyToPoint(graphicsData[from][0], 0).getY());
 		else
-			area.moveTo(xyToPoint(graphicsData[from][0], graphicsData[from][1]).getX(), xyToPoint(graphicsData[from][0], graphicsData[from][1]).getY());
+			area.moveTo(xyToPoint(0, graphicsData[from][0]).getX(), 
+					xyToPoint(-1 * graphicsData[from][1], graphicsData[from][0]).getY());
 		for (int i = from; i < to; i++) {
 		// Преобразовать значения (x,y) в точку на экране point
-			Point2D.Double point = xyToPoint(graphicsData[i][0], graphicsData[i][1]);
+			Point2D.Double point;
+			if(rotate)
+				point = xyToPoint(-1 * graphicsData[i][1], graphicsData[i][0]);
+			else
+				point = xyToPoint(graphicsData[i][0], graphicsData[i][1]);
 			area.lineTo(point.getX(), point.getY());
 		}
-		if(!rotate)
-			area.lineTo(xyToPoint(graphicsData[to][0], graphicsData[to][1]).getX(), xyToPoint(graphicsData[to][0], 0).getY());
 		
+		if(!rotate)
+			area.lineTo(xyToPoint(graphicsData[to - 1][0], 0).getX(), xyToPoint(0, 0).getY());
+		else
+			area.lineTo(xyToPoint(0, 0).getX(), xyToPoint(0, graphicsData[to - 1][0]).getY());
 		
 		area.closePath();
 		canvas.fill(area);
