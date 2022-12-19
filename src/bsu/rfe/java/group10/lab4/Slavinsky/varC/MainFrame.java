@@ -4,9 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -15,6 +17,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.event.MenuEvent;
 import javax.swing.event.MenuListener;
@@ -31,6 +34,8 @@ public class MainFrame extends JFrame {
 	private JCheckBoxMenuItem showMarkersMenuItem;
 	private JCheckBoxMenuItem showClosedAreasItem;
 	private JCheckBoxMenuItem rotateItem;
+	private JMenuItem saveToGraphicsMenuItem;
+	private JMenuItem restoreDataItem;
 	// Компонент-отображатель графика
 	private GraphicsDisplay display = new GraphicsDisplay();
 	// Флаг, указывающий на загруженность данных графика
@@ -68,6 +73,40 @@ public class MainFrame extends JFrame {
 		};
 		// Добавить соответствующий элемент меню
 		fileMenu.add(openGraphicsAction);
+		
+		//добавить возможность сохранять данные графика после изменений
+		Action saveToGraphicsAction = new AbstractAction("Сохранить изменённые данные для построения графика") {
+			
+			private static final long serialVersionUID = 1L;
+
+				public void actionPerformed(ActionEvent event) {
+					if (fileChooser == null) {
+					// Если экземпляр диалогового окна
+					// "Открыть файл" ещѐ не создан,
+					// то создать его
+					fileChooser = new JFileChooser();
+					// и инициализировать текущей директорией
+					fileChooser.setCurrentDirectory(new File("."));
+					}
+					// Показать диалоговое окно
+					if (fileChooser.showSaveDialog(MainFrame.this) == JFileChooser.APPROVE_OPTION);
+					// Если результат его показа успешный,
+					// сохранить данные в двоичный файл
+					saveToGraphicsFile(fileChooser.getSelectedFile());
+				} 
+			};
+		saveToGraphicsMenuItem = fileMenu.add(saveToGraphicsAction);
+		saveToGraphicsMenuItem.setEnabled(false);
+
+		Action restoreGraphicsAction = new AbstractAction("Восстановить данные графика") {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				display.restoreData();
+			}
+		};
+		restoreDataItem = fileMenu.add(restoreGraphicsAction);
+		restoreDataItem.setEnabled(false);
+		
 		// Создать пункт меню "График"
 		JMenu graphicsMenu = new JMenu("График");
 		menuBar.add(graphicsMenu);
@@ -173,12 +212,35 @@ public class MainFrame extends JFrame {
 		}
 	}
 	
+	//Сохранение изменённых данных в файл
+		
 	public static void main(String[] args) {
 		// Создать и показать экземпляр главного окна приложения
 		MainFrame frame = new MainFrame();
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setVisible(true);
 	}
+	
+	
+	public void saveToGraphicsFile(File selectedFile) {		
+		try {
+			// Создать новый байтовый поток вывода, направленный в указанный файл
+			DataOutputStream out = new DataOutputStream(new FileOutputStream(selectedFile));
+			
+			Double[][] graphicsData = display.getCurrentData();
+			// Записать в поток вывода попарно значение X в точке, значение многочлена в точке
+			for (int i = 0; i < graphicsData.length; i++) {
+				out.writeDouble(graphicsData[i][0]);
+				out.writeDouble(graphicsData[i][1]);
+			}
+			// Закрыть поток вывода
+			out.close();
+			} catch (Exception e) {
+			// Исключительную ситуацию "ФайлНеНайден" в данном случае можно не обрабатывать,
+			// так как мы файл создаѐм, а не открываем для чтения
+			}
+		}
+	
 	// Класс-слушатель событий, связанных с отображением меню
 	private class GraphicsMenuListener implements MenuListener {
 		// Обработчик, вызываемый перед показом меню
@@ -188,6 +250,8 @@ public class MainFrame extends JFrame {
 			showMarkersMenuItem.setEnabled(fileLoaded);
 			showClosedAreasItem.setEnabled(fileLoaded);
 			rotateItem.setEnabled(fileLoaded);
+			saveToGraphicsMenuItem.setEnabled(fileLoaded);
+			restoreDataItem.setEnabled(fileLoaded);
 		}
 		// Обработчик, вызываемый после того, как меню исчезло с экрана
 		public void menuDeselected(MenuEvent e) {
