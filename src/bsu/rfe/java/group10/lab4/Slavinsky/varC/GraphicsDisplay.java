@@ -315,7 +315,7 @@ public class GraphicsDisplay extends JPanel implements CustomMouseAdapter{
 			canvas.drawLine((int)center.x + 5, (int)center.y + 5, (int)center.x - 5, (int)center.y - 5);
 			canvas.drawLine((int)center.x - 5, (int)center.y + 5, (int)center.x + 5, (int)center.y - 5);
 			
-			if(Math.abs((int)center.x - mouseX) <= 5 && Math.abs((int)center.y - mouseY) <= 5)
+			if(!isScaling && Math.abs((int)center.x - mouseX) <= 5 && Math.abs((int)center.y - mouseY) <= 5)
 				interedPoint = point;
 		}
 		
@@ -602,20 +602,13 @@ public class GraphicsDisplay extends JPanel implements CustomMouseAdapter{
 	}
 	
 	private void scaleGraph() {
-		double[] leftHigh = pointToXY(new Point2D.Double(previousMouseX, previousMouseY));
-		double[] rightLow = pointToXY(new Point2D.Double(mouseX, mouseY));
 		
-		if(rightLow[0] < leftHigh[0]) {
-			double temp = rightLow[0];
-			rightLow[0] = leftHigh[0];
-			leftHigh[0] = temp;
-		}
+		if(Math.abs(previousMouseX - mouseX) < 2 || Math.abs(previousMouseY - mouseY) < 2)
+			return;
 		
-		if(rightLow[1] > leftHigh[1]) {
-			double temp = rightLow[1];
-			rightLow[1] = leftHigh[1];
-			leftHigh[1] = temp;
-		}
+		double[] leftHigh = pointToXY(new Point2D.Double(Math.min(previousMouseX, mouseX), Math.min(previousMouseY, mouseY)));
+		double[] rightLow = pointToXY(new Point2D.Double(Math.max(previousMouseX, mouseX), Math.max(previousMouseY, mouseY)));
+		
 		
 		borderValues.add(new Borders());
 		if(leftHigh[0] > border.minX)
